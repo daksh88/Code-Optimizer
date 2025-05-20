@@ -1,0 +1,3 @@
+curl -X POST http://127.0.0.1:5000/optimize \
+-H "Content-Type: application/json" \
+-d "{\"expression\": \"a = 2 + 3 * 4 / 8 * (4 - 3)\"}"
