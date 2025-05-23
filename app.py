@@ -1,8 +1,8 @@
-from flask import Flask, request, jsonify, render_template, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory
 import os
-from optimizer import optimize_expression, parse_expression, optimize_multiple_lines  # Add this import
+from optimizer import optimize_expression, parse_expression, optimize_multiple_lines
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='')
 
 @app.route('/')
 def index():
@@ -16,16 +16,11 @@ def serve_static(filename):
 def optimize():
     data = request.get_json()
     expr = data.get('expression')
-    
     result = optimize_multiple_lines(expr)
-    
-    return jsonify({
-        "asts": result["asts"],
-        "steps": result["steps"],
-        "variables": result["variables"]
-    })
+    return jsonify(result)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
 
 
