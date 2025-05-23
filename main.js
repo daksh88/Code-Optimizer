@@ -128,6 +128,7 @@ async function optimizeExpression() {
     displayTokens(expression);
 
     try {
+        // Use relative path instead of absolute URL
         const response = await fetch('/optimize', {
             method: 'POST',
             headers: {
@@ -186,10 +187,7 @@ async function optimizeExpression() {
 
     } catch (error) {
         console.error('Error:', error);
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'error';
-        errorDiv.textContent = `Error: ${error.message}`;
-        resultDiv.appendChild(errorDiv);
+        alert('Error optimizing expressions');
     }
 }
 

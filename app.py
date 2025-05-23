@@ -1,8 +1,10 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, url_for
+from flask_cors import CORS
 import os
 from optimizer import optimize_expression, parse_expression, optimize_multiple_lines
 
-app = Flask(__name__, static_url_path='')
+app = Flask(__name__, static_folder='.', static_url_path='')
+CORS(app)
 
 @app.route('/')
 def index():
