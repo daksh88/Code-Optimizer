@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expression Optimizer</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="card">
+            <div class="card-header">
+                <h1>Arithematic Code Optimizer</h1>
+                <p class="subtitle">Enter a mathematical expression to optimize</p>
+            </div>
+            
+            <div class="input-group">
+                <textarea 
+                    id="expression" 
+                    placeholder="Enter expressions (one per line)&#10;Example:&#10;a = 2 + 3 * 4;&#10;b = a - 10 + 5;"
+                    class="expression-input"
+                    rows="5"
+                ></textarea>
+                <button class="optimize-button" onclick="optimizeExpression()">Optimize</button>
+            </div>
+
+            <div class="results">
+                <div class="tokens-section">
+                    <h2>Tokens</h2>
+                    <div id="tokens-container"></div>
+                </div>
+
+                <div class="ast-section">
+                    <h2>Abstract Syntax Trees</h2>
+                    <div id="tree-container"></div>
+                </div>
+
+                <div class="steps-section">
+                    <h2>Optimization Steps</h2>
+                    <div class="steps" id="steps"></div>
+                </div>
+
+                <div class="final-result">
+                    <h2>Final Result</h2>
+                    <div class="result" id="result"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

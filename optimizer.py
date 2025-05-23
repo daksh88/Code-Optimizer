@@ -99,6 +99,11 @@ def fold_constants(node, steps):
 
 
 
+def parse_expression(expr):
+    tokens = tokenize(expr)
+    parser = Parser(tokens)
+    return parser.parse()
+
 def optimize_expression(expr):
     tokens = tokenize(expr)
     parser = Parser(tokens)
@@ -106,3 +111,100 @@ def optimize_expression(expr):
     steps = []
     optimized_ast = fold_constants(ast, steps)
     return optimized_ast, steps
+
+class Optimizer:
+    def __init__(self):
+        self.variables = {}
+        self.steps = []
+
+    def evaluate_node(self, node, step_trace=True):
+        if node is None:
+            return None
+
+        # If it's a leaf node (number or variable)
+        if node.left is None and node.right is None:
+            if node.value.isdigit():
+                return int(node.value)
+            # If it's a variable, show the substitution step
+            if node.value in self.variables and step_trace:
+                self.steps.append(f"Substitute {node.value} = {self.variables[node.value]}")
+                return self.variables[node.value]
+            return None
+
+        # Evaluate left and right subtrees
+        left_val = self.evaluate_node(node.left, step_trace)
+        right_val = self.evaluate_node(node.right, step_trace)
+
+        if left_val is None or right_val is None:
+            return None
+
+        # Show the intermediate calculation step
+        result = None
+        if node.value == '+': 
+            result = left_val + right_val
+            if step_trace:
+                self.steps.append(f"{left_val} + {right_val} = {result}")
+        elif node.value == '-': 
+            result = left_val - right_val
+            if step_trace:
+                self.steps.append(f"{left_val} - {right_val} = {result}")
+        elif node.value == '*': 
+            result = left_val * right_val
+            if step_trace:
+                self.steps.append(f"{left_val} × {right_val} = {result}")
+        elif node.value == '/': 
+            if right_val != 0:
+                result = left_val // right_val
+                if step_trace:
+                    self.steps.append(f"{left_val} ÷ {right_val} = {result}")
+            else:
+                return None
+
+        return result
+
+    def optimize_line(self, expr):
+        tokens = tokenize(expr.strip().rstrip(';'))
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        if ast.value == '=':
+            var_name = ast.left.value
+            self.steps.append(f"Evaluating: {var_name} = {expr[expr.index('=')+1:].strip()}")
+            
+            # First try evaluating with variables
+            result = self.evaluate_node(ast.right)
+            
+            if result is not None:
+                self.variables[var_name] = result
+                self.steps.append(f"Final: {var_name} = {result}")
+            else:
+                # Try constant folding if variable evaluation failed
+                optimized_right, fold_steps = optimize_expression(tokens[2:])
+                if fold_steps:
+                    self.steps.extend(fold_steps)
+                    result = int(fold_steps[-1].split('=')[1].strip())
+                    self.variables[var_name] = result
+                    self.steps.append(f"Final: {var_name} = {result}")
+
+        return ast
+
+def optimize_multiple_lines(code):
+    optimizer = Optimizer()
+    asts = []
+    results = []
+    
+    # Split code into lines and process each line
+    lines = [line.strip() for line in code.split('\n') if line.strip()]
+    
+    for line in lines:
+        ast = optimizer.optimize_line(line)
+        asts.append(ast)
+        
+    return {
+        "asts": [ast.to_dict() for ast in asts],
+        "steps": optimizer.steps,
+        "variables": optimizer.variables
+    }
+
+# Make sure to export both functions
+__all__ = ['optimize_multiple_lines', 'optimize_expression', 'parse_expression']
